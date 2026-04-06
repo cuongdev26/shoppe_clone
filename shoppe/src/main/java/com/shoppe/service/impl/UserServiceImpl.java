@@ -24,8 +24,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userReponsitory, PasswordEncoder passwordEncoder) {
-        this.userRepository = userReponsitory;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -45,12 +45,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse creationCustomer(UserCreationRequest request) {
+        log.info("=== [creationCustomer] START - email: {}, name: {}",
+                request.getEmail(), request.getName());
+
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email exits " + request.getEmail());
+            log.warn("[creationCustomer] Email đã tồn tại: {}", request.getEmail());
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         HashSet<Role> roles = new HashSet<>();
         roles.add(Role.USER);
+
         Customer customer = Customer.builder()
                 .name(request.getName())
                 .dob(request.getDob())
@@ -61,13 +66,19 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         Customer saved = userRepository.save(customer);
+        log.info("[creationCustomer] SUCCESS - id: {}, email: {}",
+                saved.getId(), saved.getEmail());
         return mapToUserResponse(saved);
     }
 
     @Override
     public List<UserResponse> getCustomer() {
-        return userRepository.findAll()
-                .stream()
+        log.info("=== [getCustomer] START - lấy danh sách tất cả customer");
+
+        List<Customer> customers = userRepository.findAll();
+        log.info("[getCustomer] Tìm thấy {} customer", customers.size());
+
+        return customers.stream()
                 .map(customer -> UserResponse.builder()
                         .id(customer.getId())
                         .name(customer.getName())
@@ -83,39 +94,61 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse  getCustomerEmail(String email) {
-        Customer customer = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("email have not exit"));
-        return mapToUserResponse(customer);
+    public UserResponse getCustomerEmail(String email) {
+        log.info("=== [getCustomerEmail] START - email: {}", email);
 
+        Customer customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("[getCustomerEmail] Không tìm thấy email: {}", email);
+                    return new AppException(ErrorCode.USER_NOT_FOUND); // nên dùng AppException thay RuntimeException
+                });
+
+        log.info("[getCustomerEmail] SUCCESS - id: {}", customer.getId());
+        return mapToUserResponse(customer);
     }
 
     @Override
     public UserResponse updateCustomer(UserUpdateRequest request) {
+        log.info("=== [updateCustomer] START - email: {}", request.getEmail());
+
         Customer customer = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not exits"));
+                .orElseThrow(() -> {
+                    log.warn("[updateCustomer] Không tìm thấy user với email: {}", request.getEmail());
+                    return new AppException(ErrorCode.USER_NOT_FOUND);
+                });
+
+        log.debug("[updateCustomer] Trước update - name: {}, phone: {}",
+                customer.getName(), customer.getPhoneNo());
+
         customer.setName(request.getName());
         customer.setDob(request.getDob());
         customer.setAvatarUrl(request.getAvatarUrl());
-        customer.setPassword(request.getPassword());
         customer.setPhoneNo(request.getPhone());
         customer.setEmail(request.getEmail());
+
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            log.debug("[updateCustomer] Đổi password cho email: {}", request.getEmail());
             customer.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        return mapToUserResponse(userRepository.save(customer));
+
+        Customer saved = userRepository.save(customer);
+        log.info("[updateCustomer] SUCCESS - id: {}", saved.getId());
+        return mapToUserResponse(saved);
     }
 
     @Override
     public void deleteCustomer(String id) {
-        log.info("Deleting customer id: {}", id);
+        log.info("=== [deleteCustomer] START - id: {}", id);
 
         Customer customer = userRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("[deleteCustomer] Không tìm thấy customer id: {}", id);
+                    return new AppException(ErrorCode.USER_NOT_FOUND);
+                });
 
-        // ✅ FIX: Soft delete - đánh dấu deleted = true
-        // Không xóa thật khỏi DB, giữ lại dữ liệu lịch sử
         customer.setDeleted(true);
         userRepository.save(customer);
+        log.info("[deleteCustomer] SUCCESS (soft delete) - id: {}, email: {}",
+                id, customer.getEmail());
     }
 }

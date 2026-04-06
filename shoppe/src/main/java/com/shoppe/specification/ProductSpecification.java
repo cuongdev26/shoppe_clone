@@ -12,7 +12,6 @@ import java.util.List;
 
 public class ProductSpecification {
 
-    // Không cho khởi tạo - chỉ dùng static methods
     private ProductSpecification() {}
 
     /**
