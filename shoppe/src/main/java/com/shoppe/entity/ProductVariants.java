@@ -21,7 +21,6 @@ public class ProductVariants {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    // ✅ FIX: Đổi tên field productId → product (đúng convention @ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     Products product;

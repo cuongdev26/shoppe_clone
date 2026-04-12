@@ -3,7 +3,6 @@ package com.shoppe.service;
 import com.shoppe.dto.request.UserCreationRequest;
 import com.shoppe.dto.request.UserUpdateRequest;
 import com.shoppe.dto.response.UserResponse;
-import com.shoppe.entity.Customer;
 
 import java.util.List;
 

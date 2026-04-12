@@ -10,6 +10,8 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,7 +23,6 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Orders {
 
-    // ✅ FIX: UUID không thể dùng với kiểu int → đổi sang String
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -29,7 +30,6 @@ public class Orders {
     @Column(name = "order_code", nullable = false, unique = true, length = 50)
     String orderCode;
 
-    // ✅ FIX: @JoinColumn name phải là "customer_id" không phải "id_orders"
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     Customer customer;
@@ -94,6 +94,10 @@ public class Orders {
 
     @Column(name = "completed_at")
     LocalDateTime completedAt;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    List<OrderItems> items = new ArrayList<>();
 
     @Column(name = "cancelled_at")
     LocalDateTime cancelledAt;

@@ -3,7 +3,7 @@ package com.shoppe.controller;
 import com.shoppe.dto.request.AuthenticationRequest;
 import com.shoppe.dto.response.ApiResponse;
 import com.shoppe.dto.response.AuthenticationResponse;
-import com.shoppe.service.impl.AuthenticationService;
+import com.shoppe.service.impl.AuthenticationServiceimpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
 
-    AuthenticationService authenticationService;
+    AuthenticationServiceimpl authenticationServiceimpl;
     @PostMapping("/login")
     ApiResponse<AuthenticationResponse> authenticated(@RequestBody AuthenticationRequest request) {
-        AuthenticationResponse result = authenticationService.authenticate(request);
+        AuthenticationResponse result = authenticationServiceimpl.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
                 .build();

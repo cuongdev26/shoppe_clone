@@ -37,10 +37,8 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET,"/shoppe/customer", "/shoppe/customer/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/shoppe/customer/create","/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/shoppe/customer/update").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/shoppe/customer/**").permitAll()
+                        .requestMatchers("/search", "/search/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> jwt.decoder(jwtDecoder())));

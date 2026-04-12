@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -49,14 +50,18 @@ public class Customer {
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
-    @ElementCollection(fetch = FetchType.EAGER)  // ✅ đổi thành EAGER
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "customer_role",
-            joinColumns = @JoinColumn(name = "customer_id")  // ✅ thêm dòng này
+            joinColumns = @JoinColumn(name = "customer_id")
     )
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    Set<Role> roles;
+    @Builder.Default
+    Set<Role> roles = new HashSet<>();
+    public Role getRole() {
+        return Role.getHighest(this.roles);
+    }
 
     @PrePersist
     protected void onCreated() {

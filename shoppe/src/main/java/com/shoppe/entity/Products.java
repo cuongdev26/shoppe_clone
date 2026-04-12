@@ -22,8 +22,6 @@ public class Products {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    // ✅ FIX: @JoinColumn name="" rỗng → phải điền "shop_id"
-    // ✅ FIX: Đổi tên field từ shopId → shop (đúng convention với @ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id", nullable = false)
     Shops shop;

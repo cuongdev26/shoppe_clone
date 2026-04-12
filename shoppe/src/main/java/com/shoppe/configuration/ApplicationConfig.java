@@ -2,7 +2,7 @@ package com.shoppe.configuration;
 
 import com.shoppe.constant.Role;
 import com.shoppe.entity.Customer;
-import com.shoppe.repository.UserRepository;
+import com.shoppe.repository.CustomerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +22,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userReponsitory) {
+    ApplicationRunner applicationRunner(CustomerRepository userReponsitory) {
         return args -> {
             if(userReponsitory.findByEmail("phamcuong26.dev@gmail.com").isEmpty()) {
                 HashSet<Role> roles = new HashSet<>();

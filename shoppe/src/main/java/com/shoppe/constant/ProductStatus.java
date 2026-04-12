@@ -2,6 +2,6 @@ package com.shoppe.constant;
 
 public enum ProductStatus {
     Active,
-    inactive,
-    outOfStock
+    inactive, // không hoạt động
+    outOfStock // hết hàng
 }
