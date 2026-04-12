@@ -56,7 +56,7 @@ public class UserController {
         userService.deleteCustomer(id);
 
         return ApiResponse.<String>builder()
-                .result("User has been deleted")
+                .result("User has been deleted  ")
                 .build();
 
     }
