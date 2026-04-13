@@ -9,7 +9,7 @@ import com.shoppe.entity.Customer;
 import com.shoppe.exception.AppException;
 import com.shoppe.exception.ErrorCode;
 import com.shoppe.properties.RsaKeyConfigProperties;
-import com.shoppe.repository.CustomerRepository;
+import com.shoppe.repository.UserRepository;
 import com.shoppe.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationServiceimpl implements AuthenticationService {
 
-   CustomerRepository customerRepository;
+   UserRepository customerRepository;
    RsaKeyConfigProperties rsaKeyConfigProperties;
    PasswordEncoder passwordEncoder;
 
@@ -42,7 +42,7 @@ public class AuthenticationServiceimpl implements AuthenticationService {
                customer.getPassword()
        );
 
-       // nếu k phải trả về lỗi 
+       // nếu k phải trả về lỗi
        if(!authenticated)
            throw new AppException(ErrorCode.UNAUTHENTICATED);
 
@@ -56,7 +56,7 @@ public class AuthenticationServiceimpl implements AuthenticationService {
 
    @Override
    public String generateToken(String email) {
-       JWSHeader header = new JWSHeader(JWSAlgorithm.RS512);
+       JWSHeader header = new JWSHeader(JWSAlgorithm.RS256);
        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                .subject(email)
                .issuer("phamcuongdev")
